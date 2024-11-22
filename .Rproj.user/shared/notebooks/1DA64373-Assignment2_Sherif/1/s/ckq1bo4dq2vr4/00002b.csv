@@ -1,0 +1,6 @@
+"0","#1. Create a histogram for `Purchase_Amount"
+"0","hist(synthetic_data$Purchase_Amount,"
+"0","     main = ""Histogram of Purchase Amount"",  #title"
+"0","     xlab = ""Purchase Amount"",       # Label for the x"
+"0","     ylab = ""Frequency"",         # Label for the y "
+"0",")"

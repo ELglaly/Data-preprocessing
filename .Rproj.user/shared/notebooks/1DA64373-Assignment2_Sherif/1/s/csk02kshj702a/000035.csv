@@ -1,0 +1,3 @@
+"0",""
+"0","# Show the first 6 row using head"
+"0","head(synthetic_data)"

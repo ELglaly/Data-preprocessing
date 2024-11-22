@@ -1,0 +1,8 @@
+"0",""
+"0"," "
+"0","# Visulazing the missing data pints in Age columns based on City"
+"0","ggplot(synthetic_data, "
+"0","       aes(x = ID, "
+"0","           y = Age)) + "
+"0","  geom_miss_point()+"
+"0","  facet_wrap(~City)"

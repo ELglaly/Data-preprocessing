@@ -1,0 +1,6 @@
+"0",""
+"0","# Visulazing the missing data pints in Purchase_Date columns"
+"0","ggplot(synthetic_data, "
+"0","       aes(x = ID, "
+"0","           y = Purchase_Date)) + "
+"0","  geom_miss_point()"

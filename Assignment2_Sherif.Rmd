@@ -1,0 +1,261 @@
+---
+title: "Assginment2"
+author: "Sherif Shawashen"
+date: "2024-11-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+#Before get Started
+```{r }
+# Set seed for reproducibility
+set.seed(123)
+
+# Create synthetic data with various data types and missing values
+n <- 100
+synthetic_data <- data.frame(
+  ID = 1:n,
+  Age = sample(c(20:80, NA), n, replace = TRUE),
+  Income = sample(c(30000:100000, NA), n, replace = TRUE),
+  Purchase_Amount = sample(c(50:500, NA), n, replace = TRUE),
+  City = sample(c("New York", "Los Angeles", "Chicago", NA), n, replace = TRUE),
+  Purchase_Date = sample(c("2024-01-01", "2024-02-15", "2024-03-30", NA), n, replace = TRUE)
+)
+
+# Convert Purchase_Date to Date type and introduce a factor column
+synthetic_data$Purchase_Date <- as.character(synthetic_data$Purchase_Date)
+synthetic_data$Membership = sample(c("Basic", "Silver", "Gold", "Platinum"), n, replace = TRUE)
+
+# View the synthetic dataset
+head(synthetic_data)
+
+```
+
+#Task 1: Initial Data Exploration
+```{r}
+library(tidyverse)
+library(dplyr)
+# 1- Load the `synthetic_data` into your R environment and get an overview using `head()`, `summary()`, and `str().
+synthetic_data
+
+# Show the first 6 row using head
+head(synthetic_data)
+# Summary of the dataset
+summary(synthetic_data)
+#Structure of the dataset
+str(synthetic_data)
+
+
+# 2. Identify columns with missing values and incorrect data types.
+
+#Identify columns with missing
+
+columns_with_missing_values <- synthetic_data %>%
+  select(where(~ any(is.na(.)))) %>%
+  names()
+columns_with_missing_values
+
+# Age" "City" "Purchase_Date" have missing values.
+
+# I can notice from the str() method that the purchase_date, membership ,and Income columns are the ones who have  incorrect datatypes as  purchase_date ic charachter which is worn the right datadype is Data, similarty, membership is defined as character however there are only 4 values(categories) which indicates that the propriate datatype is factor.Likewise, income yes it is correct that income are numerical but to make it more suitable we need to cinvert it to double as it may have fractions 
+
+
+```
+
+
+#Task 2: Handle Missing Values**
+```{r}
+
+library(ggplot2)
+library(naniar)
+# 1- Count the number of missing values in each column using `sapply()` and `is.na()`.
+
+
+# Count the number of missing values in each column
+number_of_missing_values <- sapply(synthetic_data, function(x) sum(is.na(x)))
+
+i=1
+while (i<= ncol(synthetic_data))
+{
+  print(paste(names(synthetic_data)[i], "has", number_of_missing_values[i], "missing values"))
+  i=i+1
+}
+
+#2 Visualize the missing data pattern using the `VIM` or `naniar` package.
+# ref -> https://cran.r-project.org/web/packages/naniar/vignettes/getting-started-w-naniar.html
+
+# Visulazing the missing data pints in Age columns
+ggplot(synthetic_data, 
+       aes(x = ID, 
+           y = Age)) + 
+  geom_miss_point()
+
+ 
+# Visulazing the missing data pints in Age columns based on City
+ggplot(synthetic_data, 
+       aes(x = ID, 
+           y = Age)) + 
+  geom_miss_point()+
+  facet_wrap(~City)
+
+# Visulazing the missing data pints in Purchase_Date columns
+ggplot(synthetic_data, 
+       aes(x = ID, 
+           y = Purchase_Date)) + 
+  geom_miss_point()
+
+
+# Visulazing the missing data pints in Purchase_Date columns based on Memberships
+ggplot(synthetic_data, 
+       aes(x = ID, 
+           y = Purchase_Date)) + 
+  geom_miss_point()+
+  facet_wrap(~Membership)
+
+# Visulazing the missing data pints in City columns
+ggplot(synthetic_data, 
+       aes(x = ID, 
+           y = City)) + 
+  geom_miss_point()
+
+
+#- Impute missing values in `Age` using the mean, and in `Income` using the median.
+#Income does not have a missing values 
+# ref -> https://scales.arabpsychology.com/stats/how-to-calculate-the-mode-in-r-with-examples/
+
+# Impute missing values in the Age column with the mean
+mean_age <- mean(synthetic_data$Age,na.rm = TRUE)
+synthetic_data$Age <- ifelse(is.na(synthetic_data$Age), mean_age, synthetic_data$Age)
+
+
+# Impute missing values in the City
+# can not find the meain beacuse this column is not a numerical but we can replace with mode
+find_mode <- function(x) {
+  
+  #remove Na before fine the mode
+  x <- na.omit(x)  
+  # Get the frequency of each unique value
+  u <- unique(x)
+  tab <- tabulate(match(x, u))
+  
+  u[tab == max(tab)]
+  
+}
+
+
+# 4- Replace missing `City` entries with "Unknown" and impute `Purchase_Date` with the most frequent date.
+
+# Impute missing values in the City column with the Unknown
+synthetic_data$City <- ifelse(is.na(synthetic_data$City),"Unknown", synthetic_data$City)
+
+
+
+#impute `Purchase_Date` with the most frequent date. (mode)
+mode_Purchase_Date <-find_mode(synthetic_data$Purchase_Date)
+# Impute missing values in the Age column with the mean
+synthetic_data$Purchase_Date <- ifelse(is.na(synthetic_data$Purchase_Date),mode_Purchase_Date , synthetic_data$Purchase_Date)
+
+
+```
+
+#Task 3: Correct Data Types
+``` {r}
+#1. Convert the `Purchase_Date` column to a `Date` type.
+
+synthetic_data$Purchase_Date <- as.Date(synthetic_data$Purchase_Date)
+#class Purchase_Date
+class(synthetic_data$Purchase_Date)
+
+
+#2. Ensure that the `Membership` column is a factor.
+class(synthetic_data$Membership)
+synthetic_data$Membership <- as.factor(synthetic_data$Membership)
+
+
+str(synthetic_data)
+```
+
+
+#Task 4: Visualize Data Distributions
+```{r}
+#1. Create a histogram for `Purchase_Amount
+hist(synthetic_data$Purchase_Amount,
+     main = "Histogram of Purchase Amount",  #title
+     xlab = "Purchase Amount",       # Label for the x
+     ylab = "Frequency",         # Label for the y 
+)
+
+#2. Generate a boxplot for `Income` to check for outliers.
+
+library(ggplot2)
+ggplot(synthetic_data, aes(y = Income)) +
+  geom_boxplot(fill = 'red', color = 'black') +
+  labs(title = "Boxplot of Income", y = "Frequency" )
+
+
+#3. Create a bar chart showing the distribution of `City`.
+
+ggplot(synthetic_data, aes(x = City)) +
+  geom_bar(fill = "orange") +  # Create bars with color
+  labs(title = "Distribution of Cities",   # Title 
+       x = "City",                   # Label for x
+       y = "Frequency")        # Label for Y
+
+
+```
+
+#Task 5: Filter and Subset Data
+
+```{r}
+#1. Create a subset of data where `Age` is above 30 and `Income` is greater than 50000.
+
+synthetic_data_subset <- synthetic_data %>%
+  filter(Age >30 & Income > 50000)
+
+#2. Filter rows where `Membership` is "Gold" or "Platinum".
+
+synthetic_data_filtered <- synthetic_data %>%
+  filter(Membership %in% c("Gold", "Platinum"))
+
+
+```
+
+
+
+
+
+###Bonus Challenges:
+`
+```{r}
+# Use `gsub()` to clean any special characters from `City` names and remove numbers from `Membership` labels (if applicable).
+
+# the patter for A to z an 0 to 9 as digits is not a special characters
+regex_city_names = "[^A-Za-z0-9]"
+
+# add some special characters to check if the function words as there is no City` names contain special characters and the same for membershop as well
+synthetic_data$City <- ifelse(synthetic_data$City =="Unknwnn", "Unk@#$nown", synthetic_data$City)
+
+#clean any special characters from `City` names
+synthetic_data$City <- gsub(regex_city_names, "", synthetic_data$City)
+
+
+# Correctly apply ifelse to change "Gold" to "5Go2ld1"
+# Ensure Membership is a character column beacuse when apply ifelase on the factor the results become incorrect 
+synthetic_data$Membership <- as.character(synthetic_data$Membership)
+
+synthetic_data$Membership <- ifelse(synthetic_data$Membership == "Basic", "Ba45sic", synthetic_data$Membership)
+
+regex_membership_names = "[^A-Za-z]"
+#remove numbers from `Membership` labels
+synthetic_data$Membership <- gsub(regex_membership_names, "", synthetic_data$Membership)
+
+#Extract the year and month from `Purchase_Date` and create new columns for them.
+# ref => https://stackoverflow.com/questions/37704212/extract-month-and-year-from-date-in-r
+library(data.table)
+synthetic_data$new_Purchase_Date <- format(as.Date(synthetic_data$Purchase_Date), "%Y-%m")
+```

@@ -1,0 +1,7 @@
+"0",""
+"0","#2. Generate a boxplot for `Income` to check for outliers."
+"0",""
+"0","library(ggplot2)"
+"0","ggplot(synthetic_data, aes(y = Income)) +"
+"0","  geom_boxplot(fill = 'red', color = 'black') +"
+"0","  labs(title = ""Boxplot of Income"", y = ""Frequency"" )"

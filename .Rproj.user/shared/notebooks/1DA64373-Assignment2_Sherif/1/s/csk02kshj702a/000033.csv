@@ -1,0 +1,4 @@
+"0","library(tidyverse)"
+"0","library(dplyr)"
+"0","# 1- Load the `synthetic_data` into your R environment and get an overview using `head()`, `summary()`, and `str()."
+"0","synthetic_data"
